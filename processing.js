@@ -2241,6 +2241,7 @@ function populateGeneDropdown(dataHeaders) {
     window.sketchOptions.selectedGenes = actuallySelected;
 }
 
+
 window.generateVis = function () {
     dataSpots = [];
     if (!document.querySelector("#canvasContainer canvas")) {
@@ -2254,6 +2255,7 @@ window.generateVis = function () {
     }
 
     if (mode == "cellComposition") {
+        // console.log('Generating cell composition vis')
         const selectedScaleName = selectedScaleValue;
         dataColors = getFreshColorArray(selectedScaleName);
 
@@ -2295,8 +2297,10 @@ window.generateVis = function () {
         const clusterIdx = headers.findIndex(h => h === window.selectedClusterFeature);
 
         for (let i = 1; i < positionsData.length - 1; i++) {
+            // assign spot coords
             const spotCoords = positionsData[i];
-
+            
+            // assign spot values
             const spotValues = cellTypeIndices.map(({ col, idx }, j) => ({
                 label: col,
                 value: valuesData[i][idx],
@@ -2348,6 +2352,7 @@ window.generateVis = function () {
     }
 
     else if (mode === "genes") {
+        // console.log('Generating genes vis')
         if (!genesData || genesData.length === 0) {
             alert("Genes Data missing");
             haltProcess();
@@ -2380,6 +2385,7 @@ window.generateVis = function () {
         }
 
         for (let i = 1; i < positionsData.length - 1; i++) {
+            // assign spot coords
             const spotCoords = positionsData[i];
             const colorMap = getColorScaleArray(window.selectedGeneColorScale);
             const geneRow = genesData[i];
@@ -2474,6 +2480,8 @@ window.generateVis = function () {
         }
     }
     window.drawAtWill = true;
+
+    // This is where the spots get passed to sketch.js
     setupCanvas(Math.floor(window.innerWidth * 0.74), window.innerHeight, dataSpots);
 };
 

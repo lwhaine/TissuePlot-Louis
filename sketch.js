@@ -75,6 +75,9 @@ function setup() {
 function draw() {
   if (!window.drawAtWill) return;
 
+  debug = select('#zoom_info')
+  debug.html(`pan X ${panX} Y ${panY} zoomFactor ${zoomFactor}`)
+
   background("#FFFFFF");
   translate(panX, panY);
   scale(zoomFactor);
@@ -326,14 +329,52 @@ function detectMarkersInCluster(allSpots, selectedCluster) {
   });
 }
 
+function aggregate_one_level(spots){
+  // spots.forEach(spot =>{
+    
+  //   const {
+  //     index, cluster, x, y, radius, values, cellCompositionValues
+  //   } = spot;
+
+  // });
+  return spots;
+}
+
+function aggregate_spots(spots) {
+  // we want to define a max and min hexagon size 
+  // then if our zoom factor is such that the hexagon goes below/ above this size/ we scale to the next level
+  // for now we can just hard code zoom levels that look good to us....
+  // zoom factor can be between 0.1 and 10 as defined in mouseWheel()
+
+  // at the highest zoom factor our spots are as we receive them
+  // as we decrease zoom factor, we want to start aggregating
+  // these are picked very arbitrarily
+  const zoom_factor_boundaries = [0.7,0.3]
+
+  // debug = select('#debug_info')
+  // debug.html(`${spots[0].index} ${spots[0].x} ${spots[0].y}`)
+  // debug.html(`${spots.length} ${spots[1].index} ${spots[1].x} ${spots[1].y}`)
+
+  zoom_factor_boundaries.forEach(boundary => {
+    if (zoomFactor < boundary) {
+      //aggregate once for every zoom factor boundary we are smaller than
+      spots = aggregate_one_level(spots)
+  }
+  });
+
+  return spots;
+}
+
 function drawHexagonGrid(spots, saveFlag = false, svgElements = []) {
   const normalize = str => str?.trim().toLowerCase().replace(/\s+/g, '').replace(/[^a-z0-9]/gi, '');
 
+  // calculate extent of data
   let minX = spots.reduce((min, spot) => Math.min(min, spot.x), Infinity);
   let maxX = spots.reduce((max, spot) => Math.max(max, spot.x), -Infinity);
   let minY = spots.reduce((min, spot) => Math.min(min, spot.y), Infinity);
   let maxY = spots.reduce((max, spot) => Math.max(max, spot.y), -Infinity);
 
+  // resize canvas so data goes from 0 to 1000 maybe?
   let RESIZE_canvas = 1000;
   let dataWidth = maxX - minX;
   let dataHeight = maxY - minY;
@@ -346,6 +387,7 @@ function drawHexagonGrid(spots, saveFlag = false, svgElements = []) {
   window.dataHeight = dataHeight;
   window.aspectRatio = aspectRatio;
 
+  // image stretch factor
   if (img && window.showImage) {
     let stretchFactorX, stretchFactorY, manualOffsetX, manualOffsetY;
     if (window.showDemoButton == 'clicked') {
@@ -406,19 +448,23 @@ function drawHexagonGrid(spots, saveFlag = false, svgElements = []) {
       tint(255, alpha);
       image(img, scaledImgX, scaledImgY, scaledImgWidth, scaledImgHeight);
       noTint();
-
+      
       if(!document.getElementById("showComposition").checked && !document.getElementById("showGenes").checked){
         return;
       }
     }
   }
 
+  // here would be where we generate/aggregate spots according to zoom level
+  spots = aggregate_spots(spots)
+  // draw each spot
   spots.forEach(spot => {
     if (spot.visible === false) return;
 
     const {
       index, cluster, x, y, radius, values, cellCompositionValues
     } = spot;
+
 
     let scaledX = (x - minX) * scaleFactor + offsetX;
     let scaledY = (y - minY) * scaleFactor + offsetY;
