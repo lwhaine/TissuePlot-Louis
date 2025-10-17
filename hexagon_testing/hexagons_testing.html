@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spot Grid Assignment</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Chart.js for plotting -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7f9;
+        }
+        .container {
+            max-width: 900px;
+        }
+        .output-box {
+            background-color: #1f2937;
+            color: #d1d5db;
+            min-height: 400px;
+        }
+        canvas {
+            max-height: 450px;
+        }
+    </style>
+</head>
+<body class="p-8">
+
+    <div class="container mx-auto bg-white p-8 rounded-xl shadow-lg">
+        <h1 class="text-3xl font-bold mb-4 text-gray-800">Spot Grid Clustering & Assignment</h1>
+        <p class="text-gray-600 mb-6">
+            The script processes the mock spot data, performs 1D DBSCAN for grouping, calculates the mean grid spacing, and assigns points to a final 2D grid structure.
+        </p>
+
+        <!-- Plotting Section -->
+        <h2 class="text-xl font-semibold mb-3 text-gray-700">Grid Assignment Visualization</h2>
+        <div class="mt-4 flex items-center justify-center mb-4">
+            <label for="colorBy" class="mr-3 text-gray-700 font-medium">Color Plot By:</label>
+            <select id="colorBy" class="rounded-lg border border-gray-300 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out">
+                <option value="grid_x">Grid X (Columns)</option>
+                <option value="grid_y">Grid Y (Rows)</option>
+            </select>
+        </div>
+        <canvas id="spotChart" class="mt-4 border border-gray-200 rounded-lg p-2 shadow-md"></canvas>
+
+        <!-- 2D Array Output Section -->
+        <h2 class="text-xl font-semibold mb-3 mt-8 text-gray-700">Generated 2D Array Output</h2>
+        <div class="output-box p-4 rounded-lg overflow-x-auto text-sm">
+            <pre id="output"></pre>
+        </div>
+
+        <p class="mt-6 text-sm text-gray-500 border-t pt-4">
+            The raw data and processing steps are logged to the browser console for inspection.
+        </p>
+    </div>
+
+    <script src="hexagons_testing.js">
+    </script>
+</body>
+</html>
